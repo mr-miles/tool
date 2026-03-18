@@ -1,4 +1,5 @@
 using DotnetDiffCoverage.Parsing;
+using DotnetDiffCoverage.Parsing.Formats;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetDiffCoverage.Services;
@@ -11,9 +12,9 @@ public static class ServiceRegistration
         services.AddTransient<DiffParser>();
 
         // Coverage parsing
-        services.AddTransient<CoberturaCoverageParser>();
-        services.AddTransient<OpenCoverCoverageParser>();
-        services.AddTransient<LcovCoverageParser>();
+        services.AddTransient<ICoverageFormatParser, CoberturaCoverageParser>();
+        services.AddTransient<ICoverageFormatParser, OpenCoverCoverageParser>();
+        services.AddTransient<ICoverageFormatParser, LcovCoverageParser>();
         services.AddTransient<CoverageParser>();
 
         // Cross-reference engine, output formatters, and API clients will be registered in later phases.

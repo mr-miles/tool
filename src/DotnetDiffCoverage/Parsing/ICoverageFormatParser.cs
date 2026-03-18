@@ -5,5 +5,8 @@ namespace DotnetDiffCoverage.Parsing;
 /// </summary>
 public interface ICoverageFormatParser
 {
+    /// <summary>The coverage format this parser handles.</summary>
+    CoverageFormat Format { get; }
+
     CoverageResult Parse(string filePath);
 }

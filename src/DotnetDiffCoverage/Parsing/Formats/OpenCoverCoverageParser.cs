@@ -1,6 +1,6 @@
 using System.Xml;
 
-namespace DotnetDiffCoverage.Parsing;
+namespace DotnetDiffCoverage.Parsing.Formats;
 
 /// <summary>
 /// Parses an OpenCover XML coverage file into a normalized CoverageResult.
@@ -8,6 +8,8 @@ namespace DotnetDiffCoverage.Parsing;
 /// </summary>
 public sealed class OpenCoverCoverageParser : ICoverageFormatParser
 {
+    public CoverageFormat Format => CoverageFormat.OpenCover;
+
     public CoverageResult Parse(string filePath)
     {
         var doc = new XmlDocument();

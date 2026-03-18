@@ -45,7 +45,7 @@ Closes the gap between "we have coverage" and "our new code is covered." Instead
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | dotnet tool packaging | Standard distribution path for .NET CLI tools; zero-friction install via `dotnet tool install` | Ship as NuGet package |
-| Auto-detect coverage format | Users shouldn't need to specify format flags; detection from file structure is reliable | Parse file header/schema to detect Cobertura vs OpenCover vs LCOV |
+| User-specified coverage format | Simpler and more explicit than file-content sniffing; no ambiguity when files have unexpected headers | `--coverage-format cobertura\|opencover\|lcov` CLI flag; invalid value exits with code 2 |
 | SARIF + JSON output | SARIF is natively understood by GitHub and ADO for inline PR annotations; JSON enables downstream tooling | Both formats required for v1 |
 | PR API integration | Eliminates manual diff export step in CI pipelines | Support GitHub and Azure DevOps PR APIs |
 

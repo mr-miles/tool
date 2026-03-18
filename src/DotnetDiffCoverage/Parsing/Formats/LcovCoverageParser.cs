@@ -1,4 +1,4 @@
-namespace DotnetDiffCoverage.Parsing;
+namespace DotnetDiffCoverage.Parsing.Formats;
 
 /// <summary>
 /// Parses an LCOV coverage file into a normalized CoverageResult.
@@ -6,6 +6,8 @@ namespace DotnetDiffCoverage.Parsing;
 /// </summary>
 public sealed class LcovCoverageParser : ICoverageFormatParser
 {
+    public CoverageFormat Format => CoverageFormat.Lcov;
+
     public CoverageResult Parse(string filePath)
     {
         var result = new Dictionary<string, HashSet<int>>(StringComparer.OrdinalIgnoreCase);

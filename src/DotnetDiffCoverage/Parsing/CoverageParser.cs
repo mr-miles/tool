@@ -7,30 +7,18 @@ namespace DotnetDiffCoverage.Parsing;
 /// </summary>
 public sealed class CoverageParser
 {
-    private readonly CoberturaCoverageParser _coberturaParser;
-    private readonly OpenCoverCoverageParser _openCoverParser;
-    private readonly LcovCoverageParser _lcovParser;
+    private readonly Dictionary<CoverageFormat, ICoverageFormatParser> _parsers;
 
-    public CoverageParser(
-        CoberturaCoverageParser coberturaParser,
-        OpenCoverCoverageParser openCoverParser,
-        LcovCoverageParser lcovParser)
+    public CoverageParser(IEnumerable<ICoverageFormatParser> parsers)
     {
-        _coberturaParser = coberturaParser;
-        _openCoverParser = openCoverParser;
-        _lcovParser = lcovParser;
+        _parsers = parsers.ToDictionary(p => p.Format);
     }
 
     /// <summary>
     /// Parses the coverage file using the specified format.
-    /// Returns <see cref="CoverageResult.Empty"/> if the format is <see cref="CoverageFormat.Unknown"/>.
+    /// Returns <see cref="CoverageResult.Empty"/> if the format is <see cref="CoverageFormat.Unknown"/>
+    /// or no parser is registered for the format.
     /// </summary>
     public CoverageResult Parse(string filePath, CoverageFormat format) =>
-        format switch
-        {
-            CoverageFormat.Cobertura => _coberturaParser.Parse(filePath),
-            CoverageFormat.OpenCover => _openCoverParser.Parse(filePath),
-            CoverageFormat.Lcov      => _lcovParser.Parse(filePath),
-            _                        => CoverageResult.Empty,
-        };
+        _parsers.TryGetValue(format, out var parser) ? parser.Parse(filePath) : CoverageResult.Empty;
 }

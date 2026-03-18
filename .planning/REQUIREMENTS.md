@@ -36,16 +36,12 @@ Output is a unified diff string fed into the same parser as REQ-03. Tokens are r
 
 ---
 
-## REQ-05: Coverage Format Auto-Detection
-**Summary**: Detect Cobertura, OpenCover, and LCOV from file contents without a user format flag.
+## REQ-05: Coverage Format Selection
+**Summary**: The user specifies the coverage format via `--coverage-format` on the CLI.
 
-Detection rules (checked in order):
-1. **LCOV**: File starts with `SF:` or `TN:` lines → LCOV format
-2. **OpenCover**: XML with root element `<CoverageSession>` → OpenCover
-3. **Cobertura**: XML with root element `<coverage>` and `version` attribute or `<packages>` child → Cobertura
-4. **Unknown**: Warn the user and skip the file
+Accepted values (case-insensitive): `cobertura`, `opencover`, `lcov`.
 
-Detection must read only the first few hundred bytes of the file — no full parse required for detection.
+The `--coverage-format` option is required when `--coverage` files are provided. If the value does not match a known format, the tool exits with code 2 and a clear error message listing the accepted values. No file-content sniffing is performed — the format is entirely determined by the CLI argument.
 
 ---
 

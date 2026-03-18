@@ -1,4 +1,5 @@
 using DotnetDiffCoverage.Parsing;
+using DotnetDiffCoverage.Parsing.Formats;
 using FluentAssertions;
 using Xunit;
 
@@ -6,10 +7,12 @@ namespace DotnetDiffCoverage.Tests;
 
 public class CoverageParserTests
 {
-    private static CoverageParser CreateParser() => new(
+    private static CoverageParser CreateParser() => new(new ICoverageFormatParser[]
+    {
         new CoberturaCoverageParser(),
         new OpenCoverCoverageParser(),
-        new LcovCoverageParser());
+        new LcovCoverageParser(),
+    });
 
     private static string FixturePath(string name) =>
         Path.Combine(AppContext.BaseDirectory, "Fixtures", name);
