@@ -76,14 +76,8 @@ jobs:
             let body = `## ${passed?'✅':'❌'} PR Diff Coverage\n\n`;
             body += `|Metric|Value|\n|---|---|\n`;
             body += `|Added lines|${total}|\n|Covered|${total-uncovered}|\n|Uncovered|${uncovered}|\n|Coverage|**${pct}%**|\n`;
-            if (threshold>0) body += `|Threshold|${threshold}% ${passed?'🎉':'âŒ'}|\n`;
-            const files = report.uncoveredFiles || [];
-            if (files.length > 0) {
-              body += `\n### Uncovered added lines\n\n`;
-              files.slice(0,20).forEach(f => {
-                body += `<details><summary><code>${f.path}</code> â€” ${f.uncoveredLines.length} line(s)</summary>\n\nLines: ${f.uncoveredLines.join(', ')}\n\n</details>\n`;
-              });
-            } else { body += `\n_All added lines are covered_ ðŸŽ‰\n`; }
+            if (threshold>0) body += `|Threshold|${threshold}% ${passed?'🎉':'❌'}|\n`;
+            body += `\n> Uncovered lines are shown as inline annotations on the diff.`;
             body += `\n<!-- dotnet-diff-coverage -->`;
             const {data:comments} = await github.rest.issues.listComments({...context.repo, issue_number: context.issue.number});
             const ex = comments.find(c=>c.body.includes('<!-- dotnet-diff-coverage -->'));
