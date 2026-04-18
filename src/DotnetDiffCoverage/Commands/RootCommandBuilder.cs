@@ -5,11 +5,22 @@ using DotnetDiffCoverage.Output;
 using DotnetDiffCoverage.Parsing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using DotnetDiffCoverage.Services;
 
 namespace DotnetDiffCoverage.Commands;
 
 public static class RootCommandBuilder
 {
+    /// <summary>Builds the root command using a default DI host. Useful for testing.</summary>
+    public static RootCommand Build()
+    {
+        var host = Host.CreateDefaultBuilder()
+            .ConfigureLogging(logging => logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Warning))
+            .ConfigureServices((_, services) => services.AddDiffCoverageServices())
+            .Build();
+        return Build(host);
+    }
+
     public static RootCommand Build(IHost host)
     {
         var rootCommand = new RootCommand(
