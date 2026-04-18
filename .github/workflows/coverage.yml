@@ -46,9 +46,10 @@ jobs:
           dotnet-diff-coverage \
             --diff pr.diff \
             --coverage "${{ steps.coverage.outputs.REPORT }}" \
-            --format cobertura \
+            --coverage-format cobertura \
             --output-json coverage-report.json \
-            --output-sarif coverage.sarif || true
+            --output-sarif coverage.sarif
+        continue-on-error: true
       - name: Upload SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v4
