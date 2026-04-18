@@ -6,15 +6,24 @@
     <ToolCommandName>dotnet-diff-coverage</ToolCommandName>
     <PackageId>dotnet-diff-coverage</PackageId>
     <Version>0.1.0</Version>
-    <Description>Cross-references a code diff with .NET coverage files to surface uncovered lines introduced by a PR.</Description>
-    <Authors>Your Name</Authors>
+    <Description>Cross-references a unified diff with .NET coverage reports (Cobertura/OpenCover/LCOV) to surface uncovered lines introduced by a PR. Outputs console, JSON, and SARIF reports.</Description>
+    <Authors>Miles Waller</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/mr-miles/dotnet-diff-coverage</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mr-miles/dotnet-diff-coverage</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>coverage;diff;testing;dotnet;sarif;cobertura</PackageTags>
 
     <!-- Output -->
     <OutputType>Exe</OutputType>
     <AssemblyName>dotnet-diff-coverage</AssemblyName>
     <RootNamespace>DotnetDiffCoverage</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
