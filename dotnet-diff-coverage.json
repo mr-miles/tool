@@ -25,5 +25,6 @@
     "**/*.targets",
     "**/*.config"
   ],
-  "threshold": 0
+  "threshold": 0,
+  "sarifLevel": "note"
 }

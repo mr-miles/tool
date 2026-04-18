@@ -12,7 +12,7 @@ public sealed class ToolConfig
     /// <summary>Glob patterns for non-source files to exclude from diff analysis entirely.</summary>
     public IReadOnlyList<string> ExcludePatterns { get; init; } = DefaultExcludePatterns;
 
-    /// <summary>Coverage threshold (0â100). Exit code 1 if uncovered % exceeds this.</summary>
+    /// <summary>Coverage threshold (0–100). Exit code 1 if uncovered % exceeds this.</summary>
     public double Threshold { get; init; } = 0.0;
 
     /// <summary>Default coverage format if not specified on CLI.</summary>
@@ -20,6 +20,9 @@ public sealed class ToolConfig
 
     /// <summary>Prefix to strip from coverage file paths before matching against diff paths.</summary>
     public string? CoveragePathPrefix { get; init; }
+
+    /// <summary>SARIF result level for uncovered lines. Valid values: "error", "warning", "note", "none".</summary>
+    public string SarifLevel { get; init; } = "warning";
 
     public static readonly IReadOnlyList<string> DefaultTestFilePatterns = new[]
     {

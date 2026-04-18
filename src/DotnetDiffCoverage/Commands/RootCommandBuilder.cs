@@ -245,12 +245,12 @@ public static class RootCommandBuilder
             var sarifReporter = services.GetRequiredService<SarifReporter>();
             if (outputSarif.Name == "-")
             {
-                await sarifReporter.WriteAsync(result, Console.OpenStandardOutput());
+                await sarifReporter.WriteAsync(result, Console.OpenStandardOutput(), config.SarifLevel);
             }
             else
             {
                 using var stream = outputSarif.Open(FileMode.Create);
-                await sarifReporter.WriteAsync(result, stream);
+                await sarifReporter.WriteAsync(result, stream, config.SarifLevel);
             }
         }
 

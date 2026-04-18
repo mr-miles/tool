@@ -24,13 +24,13 @@ public sealed class SarifReporter
         [property: JsonPropertyName("$schema")] string Schema,
         object[] Runs);
 
-    public async Task WriteAsync(CrossReferenceResult result, Stream stream)
+    public async Task WriteAsync(CrossReferenceResult result, Stream stream, string level = "warning")
     {
         var results = result.Files
             .SelectMany(f => f.UncoveredRanges.Select(range => new
             {
                 ruleId = "DC001",
-                level = "warning",
+                level,
                 message = new
                 {
                     text = range.Start == range.End
