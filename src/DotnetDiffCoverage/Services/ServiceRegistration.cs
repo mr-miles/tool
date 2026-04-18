@@ -1,4 +1,6 @@
 using DotnetDiffCoverage.Analysis;
+using DotnetDiffCoverage.Config;
+using DotnetDiffCoverage.Output;
 using DotnetDiffCoverage.Parsing;
 using DotnetDiffCoverage.Parsing.Formats;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +23,13 @@ public static class ServiceRegistration
         // Cross-reference engine
         services.AddTransient<CrossReferenceEngine>();
 
-        // Output formatters and API clients will be registered in later phases.
+        // Config
+        services.AddTransient<ConfigLoader>();
+
+        // Output formatters
+        services.AddTransient<JsonReporter>();
+        services.AddTransient<SarifReporter>();
+
         return services;
     }
 }
