@@ -15,7 +15,6 @@ public static class RootCommandBuilder
     public static RootCommand Build()
     {
         var host = Host.CreateDefaultBuilder()
-            .ConfigureLogging(logging => logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Warning))
             .ConfigureServices((_, services) => services.AddDiffCoverageServices())
             .Build();
         return Build(host);
