@@ -19,6 +19,13 @@ public sealed class SarifReporter
         typeof(SarifReporter).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
             ?.InformationalVersion.Split('+')[0] ?? "0.0.0";
 
+    // Anonymous types cannot carry attributes, so we use a record for the top-level
+    // SARIF object in order to emit the "$schema" key via [JsonPropertyName].
+    private sealed record SarifRoot(
+        string Version,
+        [property: JsonPropertyName("$schema")] string Schema,
+        object[] Runs);
+
     public async Task WriteAsync(CrossReferenceResult result, Stream stream)
     {
         var results = result.Files
@@ -45,11 +52,10 @@ public sealed class SarifReporter
             }))
             .ToList();
 
-        var sarif = new
-        {
-            version = "2.1.0",
-            schema = "https://json.schemastore.org/sarif-2.1.0.json",
-            runs = new[]
+        var sarif = new SarifRoot(
+            Version: "2.1.0",
+            Schema: "https://json.schemastore.org/sarif-2.1.0.json",
+            Runs: new[]
             {
                 new
                 {
@@ -59,7 +65,7 @@ public sealed class SarifReporter
                         {
                             name = "dotnet-diff-coverage",
                             version = ToolVersion,
-                            informationUri = "https://github.com/mr-miles/tool",
+                            informationUri = "https://github.com/mr-miles/dotnet-diff-coverage",
                             rules = new[]
                             {
                                 new
@@ -68,7 +74,7 @@ public sealed class SarifReporter
                                     name = "UncoveredAddedLine",
                                     shortDescription = new { text = "Added line not covered by tests" },
                                     fullDescription = new { text = "A line was added in this diff but is not covered by any test in the provided coverage reports." },
-                                    helpUri = "https://github.com/mr-miles/tool#dc001",
+                                    helpUri = "https://github.com/mr-miles/dotnet-diff-coverage#dc001",
                                     defaultConfiguration = new { level = "warning" },
                                 },
                             },
@@ -76,10 +82,9 @@ public sealed class SarifReporter
                     },
                     results,
                 },
-            },
-        };
+            }
+        );
 
         await JsonSerializer.SerializeAsync(stream, sarif, Options);
     }
 }
-
