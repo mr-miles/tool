@@ -1,5 +1,9 @@
 name: PR Coverage Report
 
+concurrency:
+  group: coverage-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 on:
   pull_request:
     types: [opened, synchronize, reopened]
