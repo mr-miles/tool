@@ -278,4 +278,31 @@ public class DiffParserTests
         result.FileAddedLines.Should().NotContainKey("src/OldFile.cs");
         result.FileAddedLines.Should().BeEmpty();
     }
+
+    // ─── Comment-only lines are excluded from added lines ────────────────────
+
+    [Fact]
+    public void Parse_CommentOnlyLines_AreExcludedFromAddedLines()
+    {
+        var diff = """
+            --- a/src/Foo.cs
+            +++ b/src/Foo.cs
+            @@ -1,3 +1,8 @@
+             class Foo
+             {
+            +    // A pure line comment
+            +    /* block comment */
+            +    * continuation
+            +    int x = 5; // inline comment kept
+            +    int y = 6;
+             }
+            """;
+
+        var result = _parser.Parse(diff);
+
+        // Lines 3, 4, 5 are comment-only (// comment, /* block */, * continuation)
+        // Lines 6 and 7 contain actual code (int x, int y) and must be included
+        result.FileAddedLines.Should().ContainKey("src/Foo.cs");
+        result.FileAddedLines["src/Foo.cs"].Should().BeEquivalentTo(new[] { 6, 7 });
+    }
 }
