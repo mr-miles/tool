@@ -13,22 +13,6 @@ public sealed class JsonReporter
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
     };
 
-    /// <summary>Groups a sorted sequence of line numbers into contiguous ranges.</summary>
-    private static IEnumerable<(int Start, int End)> ToRanges(IEnumerable<int> lines)
-    {
-        int? start = null, prev = null;
-        foreach (var line in lines.OrderBy(x => x))
-        {
-            if (prev == null || line != prev + 1)
-            {
-                if (start != null) yield return (start.Value, prev!.Value);
-                start = line;
-            }
-            prev = line;
-        }
-        if (start != null) yield return (start.Value, prev!.Value);
-    }
-
     public async Task WriteAsync(CrossReferenceResult result, Stream stream)
     {
         var report = new
@@ -45,7 +29,7 @@ public sealed class JsonReporter
                 {
                     path = f.FilePath,
                     uncoveredLines = f.UncoveredLines,
-                    uncoveredRanges = ToRanges(f.UncoveredLines)
+                    uncoveredRanges = f.UncoveredRanges
                         .Select(r => new { start = r.Start, end = r.End })
                         .ToList(),
                 }),
