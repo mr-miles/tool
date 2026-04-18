@@ -86,8 +86,12 @@ public sealed class DiffParser
             // Inside a hunk
             if (trimmedLine.StartsWith("+") && !trimmedLine.StartsWith("+++"))
             {
-                // Added line
-                currentFile.AddedLines.Add(currentLineNumber);
+                // Added line — skip comment-only lines (they have no coverable code)
+                var lineContent = trimmedLine[1..];
+                if (!IsCommentOnlyLine(lineContent))
+                {
+                    currentFile.AddedLines.Add(currentLineNumber);
+                }
                 currentLineNumber++;
             }
             else if (trimmedLine.StartsWith("-") && !trimmedLine.StartsWith("---"))
@@ -123,6 +127,22 @@ public sealed class DiffParser
     {
         var text = File.ReadAllText(filePath);
         return Parse(text);
+    }
+
+    /// <summary>
+    /// Returns true if the line content (with the leading diff marker already stripped)
+    /// consists entirely of a comment and therefore has no coverable code.
+    /// Lines that contain code before a comment marker (e.g. <c>int x = 5; // note</c>)
+    /// are NOT considered comment-only and will return false.
+    /// </summary>
+    private static bool IsCommentOnlyLine(string lineContent)
+    {
+        var trimmed = lineContent.TrimStart();
+        // Pure line comment
+        if (trimmed.StartsWith("//")) return true;
+        // Block comment line (opening /* or continuation line starting with *)
+        if (trimmed.StartsWith("/*") || trimmed.StartsWith("*")) return true;
+        return false;
     }
 
     /// <summary>
