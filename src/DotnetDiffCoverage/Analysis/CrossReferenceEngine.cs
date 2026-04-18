@@ -1,10 +1,11 @@
+using DotnetDiffCoverage.Models;
 using DotnetDiffCoverage.Parsing;
 
 namespace DotnetDiffCoverage.Analysis;
 
 /// <summary>
 /// Intersects a <see cref="DiffResult"/> with a <see cref="CoverageResult"/> to produce
-/// a <see cref="CrossReferenceResult"/> listing uncovered diff lines per file with aggregate statistics.
+/// a <see cref="CrossReferenceResult"/> listing uncovered diff ranges per file with aggregate statistics.
 /// </summary>
 public sealed class CrossReferenceEngine
 {
@@ -15,25 +16,23 @@ public sealed class CrossReferenceEngine
     /// <param name="coverage">Parsed coverage result.</param>
     /// <param name="coveragePathPrefix">
     /// Optional prefix to strip from coverage file paths before matching against diff paths.
-    /// Use this when coverage paths are absolute (e.g., <c>/home/ci/repo/</c>) and diff paths are relative
-    /// (e.g., <c>src/Foo.cs</c>). Pass <c>null</c> when paths already match exactly.
     /// </param>
     public CrossReferenceResult Analyze(DiffResult diff, CoverageResult coverage, string? coveragePathPrefix = null)
     {
-        if (diff.FileAddedLines.Count == 0)
+        if (diff.FileAddedRanges.Count == 0)
             return CrossReferenceResult.Empty;
 
-        var files = new List<UncoveredFile>(diff.FileAddedLines.Count);
+        var files = new List<UncoveredFile>(diff.FileAddedRanges.Count);
 
-        foreach (var (diffPath, addedLines) in diff.FileAddedLines)
+        foreach (var (diffPath, addedRanges) in diff.FileAddedRanges)
         {
             var coveredLines = FindCoverageMatch(diffPath, coverage, coveragePathPrefix);
 
-            IReadOnlyList<int> uncoveredLines = coveredLines is null
-                ? addedLines
-                : addedLines.Where(l => !coveredLines.Contains(l)).ToList();
+            IReadOnlyList<LineRange> uncoveredRanges = coveredLines is null
+                ? addedRanges
+                : GroupUncoveredLines(addedRanges, coveredLines);
 
-            files.Add(new UncoveredFile(diffPath, addedLines, uncoveredLines));
+            files.Add(new UncoveredFile(diffPath, addedRanges, uncoveredRanges));
         }
 
         var totalAdded = files.Sum(f => f.AddedLines.Count);
@@ -46,19 +45,62 @@ public sealed class CrossReferenceEngine
     }
 
     /// <summary>
+    /// Takes the added ranges for a file and the set of covered lines, and returns the uncovered
+    /// lines grouped back into <see cref="LineRange"/> objects.
+    /// </summary>
+    private static IReadOnlyList<LineRange> GroupUncoveredLines(
+        IReadOnlyList<LineRange> addedRanges, IReadOnlySet<int> coveredLines)
+    {
+        var result = new List<LineRange>();
+        int? runStart = null, runEnd = null;
+
+        foreach (var line in addedRanges.SelectMany(r => r.Lines).OrderBy(l => l))
+        {
+            if (coveredLines.Contains(line))
+            {
+                if (runStart.HasValue)
+                {
+                    result.Add(new LineRange(runStart.Value, runEnd!.Value));
+                    runStart = null;
+                    runEnd = null;
+                }
+            }
+            else
+            {
+                if (runStart == null)
+                {
+                    runStart = line;
+                    runEnd = line;
+                }
+                else if (line == runEnd + 1)
+                {
+                    runEnd = line;
+                }
+                else
+                {
+                    result.Add(new LineRange(runStart.Value, runEnd!.Value));
+                    runStart = line;
+                    runEnd = line;
+                }
+            }
+        }
+
+        if (runStart.HasValue)
+            result.Add(new LineRange(runStart.Value, runEnd!.Value));
+
+        return result;
+    }
+
+    /// <summary>
     /// Finds the coverage entry that matches <paramref name="diffPath"/>.
     /// Returns null when no match is found (file treated as fully uncovered).
     /// </summary>
     private static IReadOnlySet<int>? FindCoverageMatch(
         string diffPath, CoverageResult coverage, string? coveragePathPrefix)
     {
-        // 1. Exact match (dictionary uses OrdinalIgnoreCase)
         if (coverage.FileCoveredLines.TryGetValue(diffPath, out var exact))
             return exact;
 
-        // 2. Prefix-stripped match: strip the user-supplied prefix from coverage paths,
-        //    then compare exactly. Handles: diff "src/Foo.cs" ↔ coverage "/home/ci/repo/src/Foo.cs"
-        //    when --coverage-path-prefix "/home/ci/repo/" is provided.
         if (coveragePathPrefix is not null)
         {
             var normalizedPrefix = coveragePathPrefix.Replace('\\', '/');
