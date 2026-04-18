@@ -43,7 +43,7 @@ public sealed class TestFileFilter
     private static bool IsTestFile(string filePath, Matcher matcher)
     {
         // Matcher works with relative paths; normalise separators
-        var normalised = filePath.Replace('\\\, '/'\).TrimStart('/'\);
+        var normalised = filePath.Replace('\\', '/').TrimStart('/');
         return matcher.Match(normalised).HasMatches;
     }
 
@@ -52,7 +52,7 @@ public sealed class TestFileFilter
         if (matcher == null)
             return false;
 
-        var normalised = filePath.Replace('\\\, '/'\).TrimStart('/'\);
+        var normalised = filePath.Replace('\\', '/').TrimStart('/');
         return matcher.Match(normalised).HasMatches;
     }
 }
