@@ -70,7 +70,7 @@ jobs:
             try { report = JSON.parse(fs.readFileSync('coverage-report.json', 'utf8')); }
             catch { return; }
             const s = report.summary || {};
-            const total = s.addedLines || 0, uncovered = s.uncoveredLines || 0;
+            const total = s.totalAddedLines || 0, uncovered = s.totalUncoveredLines || 0;
             const pct = total > 0 ? Math.round(((total-uncovered)/total)*100) : 100;
             const threshold = s.threshold || 0, passed = pct >= threshold;
             let body = `## ${passed?'✅':'❌'} PR Diff Coverage\n\n`;
