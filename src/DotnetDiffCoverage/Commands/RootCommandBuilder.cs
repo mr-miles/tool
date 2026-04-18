@@ -157,8 +157,11 @@ public static class RootCommandBuilder
         }
         else
         {
-            Console.Error.WriteLine("No --diff provided. Use --diff <file> or --diff - for stdin.");
-            return 2;
+            // No diff provided: print usage hint and exit cleanly.
+            // (Equivalent to running with --help for the common "no args" case.)
+            Console.WriteLine("Usage: dotnet-diff-coverage --diff <file|-> --coverage <file> --format <format>");
+            Console.WriteLine("Run with --help for full usage information.");
+            return 0;
         }
 
         // Filter test files from diff
