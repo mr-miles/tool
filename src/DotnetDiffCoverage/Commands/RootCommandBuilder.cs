@@ -1,5 +1,4 @@
 using System.CommandLine;
-using System.CommandLine.Invocation;
 using DotnetDiffCoverage.Analysis;
 using DotnetDiffCoverage.Config;
 using DotnetDiffCoverage.Output;
@@ -11,7 +10,7 @@ namespace DotnetDiffCoverage.Commands;
 
 public static class RootCommandBuilder
 {
-    public static RootCommand Build()
+    public static RootCommand Build(IHost host)
     {
         var rootCommand = new RootCommand(
             "Cross-references a code diff with .NET coverage files to surface uncovered lines introduced by a PR.");
@@ -55,10 +54,10 @@ public static class RootCommandBuilder
             getDefaultValue: () => 0.0,
             description: "Maximum allowed percentage of uncovered diff lines before exit code 1 (0-100, default 0).");
 
-        // --config: path to dotnet-diff-coverage.json or .yml config file
+        // --config: path to dotnet-diff-coverage.json config file
         var configOption = new Option<FileInfo?>(
             name: "--config",
-            description: "Path to a JSON or YAML config file. Defaults to dotnet-diff-coverage.json in the current directory.");
+            description: "Path to a JSON config file. Defaults to dotnet-diff-coverage.json in the current directory.");
 
         // --coverage-path-prefix: prefix to strip from coverage file paths so they match diff paths exactly
         var coveragePathPrefixOption = new Option<string?>(
@@ -93,11 +92,9 @@ public static class RootCommandBuilder
             var configFile = context.ParseResult.GetValueForOption(configOption);
             var noColor = context.ParseResult.GetValueForOption(noColorOption);
 
-            var host = context.GetHost();
-            var exitCode = await HandleAsync(
+            context.ExitCode = await HandleAsync(
                 diffFile, coverageFiles, coverageFormat, coveragePathPrefix,
                 outputJson, outputSarif, threshold, configFile, noColor, host);
-            context.ExitCode = exitCode;
         });
 
         return rootCommand;
@@ -207,7 +204,7 @@ public static class RootCommandBuilder
             coverage = new CoverageResult(readOnlyMerged);
         }
 
-        // Cross-reference
+        // Cross-reference diff against coverage
         var result = engine.Analyze(filteredDiff, coverage, effectivePrefix);
 
         // Console output
