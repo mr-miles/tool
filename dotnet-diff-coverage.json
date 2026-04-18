@@ -12,7 +12,18 @@
     "**/*Fixture.cs",
     "**/*Fixtures.cs"
   ],
-  "threshold": 0,
-  "coverageFormat": "cobertura",
-  "coveragePathPrefix": ""
+  "excludePatterns": [
+    "**/*.yml",
+    "**/*.yaml",
+    "**/*.json",
+    "**/*.md",
+    "**/*.xml",
+    "**/*.txt",
+    "**/*.csproj",
+    "**/*.sln",
+    "**/*.props",
+    "**/*.targets",
+    "**/*.config"
+  ],
+  "threshold": 0
 }

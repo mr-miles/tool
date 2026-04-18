@@ -2,7 +2,7 @@
 
 A .NET global tool that cross-references a PR diff with your test coverage report to surface lines you added but didn't test.
 
-Pipe it into CI to block merges when new code lacks coverage, or run it locally before pushing to catch gaps early.
+Pipe it into CI to block merges when new code lacks coverage, or run it locally before pushing to catch gaps early.  
 
 ## Install
 

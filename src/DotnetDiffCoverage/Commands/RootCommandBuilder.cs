@@ -165,7 +165,7 @@ public static class RootCommandBuilder
         }
 
         // Filter test files from diff
-        var filteredDiff = TestFileFilter.ExcludeTestFiles(diff, config.TestFilePatterns);
+        var filteredDiff = TestFileFilter.ExcludeTestFiles(diff, config.TestFilePatterns, config.ExcludePatterns);
 
         // Parse coverage
         var coverage = CoverageResult.Empty;
