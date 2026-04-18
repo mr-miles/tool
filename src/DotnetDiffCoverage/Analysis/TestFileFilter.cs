@@ -1,3 +1,4 @@
+using DotnetDiffCoverage.Models;
 using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace DotnetDiffCoverage.Analysis;
@@ -31,18 +32,17 @@ public sealed class TestFileFilter
                 excludeMatcher.AddInclude(pattern);
         }
 
-        var filtered = diff.FileAddedLines
+        var filtered = diff.FileAddedRanges
             .Where(kvp => !IsTestFile(kvp.Key, testMatcher)
                        && !IsExcluded(kvp.Key, excludeMatcher))
             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
         return new DotnetDiffCoverage.Parsing.DiffResult(
-            (IReadOnlyDictionary<string, IReadOnlyList<int>>)filtered);
+            (IReadOnlyDictionary<string, IReadOnlyList<LineRange>>)filtered);
     }
 
     private static bool IsTestFile(string filePath, Matcher matcher)
     {
-        // Matcher works with relative paths; normalise separators
         var normalised = filePath.Replace('\\', '/').TrimStart('/');
         return matcher.Match(normalised).HasMatches;
     }
@@ -51,7 +51,6 @@ public sealed class TestFileFilter
     {
         if (matcher == null)
             return false;
-
         var normalised = filePath.Replace('\\', '/').TrimStart('/');
         return matcher.Match(normalised).HasMatches;
     }
