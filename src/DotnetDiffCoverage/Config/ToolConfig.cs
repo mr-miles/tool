@@ -51,5 +51,9 @@ public sealed class ToolConfig
         "**/*.props",
         "**/*.targets",
         "**/*.config",
+        ".gitignore",
+        ".github/*",
+        ".devcontainer/*",
+        ".editorconfig",
     };
 }

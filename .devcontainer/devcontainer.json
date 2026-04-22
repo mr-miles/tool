@@ -1,0 +1,25 @@
+{
+  "name": "DotnetDiffCoverage (.NET 8)",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:1-8.0",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csharp",
+        "EditorConfig.EditorConfig",
+        "ryanluker.vscode-coverage-gutters"
+      ],
+      "settings": {
+        "files.eol": "\r\n",
+        "editor.formatOnSave": true,
+        "dotnet.defaultSolution": "DotnetDiffCoverage.sln"
+      }
+    }
+  },
+  "postCreateCommand": "dotnet restore",
+  "remoteUser": "vscode"
+}
